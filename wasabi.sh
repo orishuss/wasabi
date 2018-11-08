@@ -27,6 +27,10 @@ change_name() {
 
     viewport="$(get_current_viewport)"
 
+    if [ -z "$name" ]; then
+        name="$viewport"
+    fi
+
     sed -i "$viewport""s|.*|""$name""|g" "$CONFIG_FILE"
 }
 
@@ -39,18 +43,8 @@ change_to_default_name() {
 }
 
 get_current_viewport() {
-    # Get the location of the viewport.
-    location="$(xprop -root -notype _NET_DESKTOP_VIEWPORT)"
-    x="$(echo ""$location"" | cut -d' ' -f3 \
-        | cut -d',' -f1)"
-    y="$(echo ""$location"" | cut -d' ' -f4)"
-
-    row=$((y / $VIEWPORT_HEIGHT))
-    column=$((x / $VIEWPORT_WIDTH))
-
-    viewport="$((row * HORIZONTAL_VIEWPORTS))"
-    viewport="$((viewport + column))"
-    viewport="$((viewport + 1))"
+    viewport="$(xdotool get_desktop)"
+    viewport="$(($viewport + 1))"
 
     echo "$viewport"
 }
@@ -133,7 +127,7 @@ done
 
 if [[ -z "$name" ]]; then
     # Change to default name.
-    change_name "  "
+    change_name
 else
     # Change to the name the user entered.
     change_name "$name"
